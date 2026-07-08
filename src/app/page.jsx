@@ -36,7 +36,7 @@ export default function ComingSoon() {
       </div>
 
       {/* 3D Globe Background */}
-      <div className="absolute inset-0 z-0 flex items-center justify-center opacity-40 dark:opacity-50 mt-10 md:mt-0">
+      <div className="absolute inset-0 z-0 flex items-center justify-center opacity-40 dark:opacity-50 mt-15 md:mt-0">
         <div className="w-[1200px] max-w-full scale-125 md:scale-110">
           {/* Methana hideHUD={true} dammama text okkoma hide wenawa */}
           <NodeGlobe hideHUD={true} />
@@ -44,7 +44,7 @@ export default function ComingSoon() {
       </div>
 
       {/* Animated Glassmorphism Content Card */}
-      <div className="relative z-10 w-full max-w-2xl px-6 pointer-events-none mt-16 md:mt-0">
+      <div className="relative z-10 w-full max-w-2xl px-6 pointer-events-none mt-16 md:mt-20">
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
