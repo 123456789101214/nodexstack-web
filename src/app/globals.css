@@ -1,26 +1,76 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-border: var(--border);
+  --color-accent: var(--accent);
+  --color-accent-deep: var(--accent-deep);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+
+  --font-display: "Space Grotesk", sans-serif;
+  --font-body: "Inter", sans-serif;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
+@layer base {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    /* Light Theme Tokens */
+    --bg: #FFFFFF;
+    --surface: #FFFFFF;
+    --border: #F1F6F9;
+    --accent: #1DACFD;
+    --accent-deep: #2D7DD2;
+    --text-primary: #0B1220;
+    --text-secondary: #4B5563;
+  }
+
+  .dark {
+    /* Dark Theme Tokens */
+    --bg: #000516;
+    --surface: #1E2234;
+    --border: rgba(255, 255, 255, 0.08);
+    --accent: #06B3FE;
+    --accent-deep: #2D7DD2;
+    --text-primary: #F5F7FA;
+    --text-secondary: #94A3B8;
+  }
+
+  /* Base Resets for smooth transitions */
+  html {
+    background-color: var(--bg);
+    color: var(--text-primary);
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  body {
+    @apply font-body antialiased selection:bg-accent selection:text-white;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-display text-text-primary tracking-tight;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Logo Visibility Theme Sync */
+.theme-logo-light {
+  display: block;
+}
+
+.theme-logo-dark {
+  display: none;
+}
+
+/* html tag ekata dark class eka add weddi wena dewal */
+html.dark .theme-logo-light {
+  display: none;
+}
+
+html.dark .theme-logo-dark {
+  display: block;
 }
