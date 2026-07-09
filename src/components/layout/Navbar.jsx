@@ -29,22 +29,21 @@ export default function Navbar() {
       >
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between">
           
-          {/* Logo Lockup */}
-          <Link href="/" className="flex items-center gap-3 group relative z-50">
-            {/* Geometric Interlocking X (SVG implementation of your logo) */}
-            <svg width="36" height="36" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" className="transform group-hover:scale-105 transition-transform duration-300">
-              <path d="M10 10 L30 30" stroke="var(--accent)" strokeWidth="6" strokeLinecap="round"/>
-              <path d="M30 10 L10 30" stroke="var(--accent-deep)" strokeWidth="6" strokeLinecap="round" className="mix-blend-multiply dark:mix-blend-lighten opacity-90"/>
-            </svg>
-            <div className="flex flex-col justify-center">
-              <span className="font-display font-bold text-2xl tracking-tight text-text-primary leading-none">
-                Node<span className="text-accent">X</span>stack
-              </span>
-              <span className="font-body text-[0.55rem] font-bold tracking-[0.22em] text-text-secondary mt-[2px]">
-                SOFTWARE SOLUTIONS
-              </span>
-            </div>
-          </Link>
+          <div className="flex items-center gap-3">
+          {/* Light Theme Logo */}
+          <img
+            src="/logo-light.png"
+            alt="NodeXstack Light Logo"
+            className="theme-logo-light h-10 md:h-12 lg:h-14 w-auto object-contain transition-opacity duration-300"
+          />
+
+          {/* Dark Theme Logo */}
+          <img
+            src="/logo-dark.png"
+            alt="NodeXstack Dark Logo"
+            className="theme-logo-dark h-10 md:h-12 lg:h-14 w-auto object-contain transition-opacity duration-300"
+          />
+        </div>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-8">

@@ -1,6 +1,6 @@
 import { Space_Grotesk, Inter } from "next/font/google";
 import "./globals.css";
-
+import SmoothScrollWrapper from "@/components/ui/SmoothScrollWrapper";
 // Font configurations
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
@@ -40,7 +40,9 @@ export default function RootLayout({ children }) {
         />
       </head>
       <body className={`${spaceGrotesk.variable} ${inter.variable} min-h-screen flex flex-col relative`}>
+        <SmoothScrollWrapper>
         {children}
+        </SmoothScrollWrapper>
       </body>
     </html>
   );

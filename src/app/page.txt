@@ -91,7 +91,7 @@ export default function ComingSoon() {
             className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto"
             onSubmit={(e) => e.preventDefault()}
           >
-            {/* <div className="relative flex-grow">
+            <div className="relative flex-grow">
               <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-text-secondary w-5 h-5" />
               <input
                 type="email"
@@ -99,12 +99,12 @@ export default function ComingSoon() {
                 placeholder="Enter your email address"
                 className="w-full bg-bg/50 border border-border focus:border-accent rounded-xl py-3 pl-12 pr-4 text-text-primary outline-none transition-all duration-300 placeholder:text-text-secondary/50 font-body"
               />
-            </div> */}
+            </div>
             <button
               type="submit"
-              className="bg-accent hover:brightness-110 text-white px-6 py-3 rounded-xl font-medium transition-all duration-300 flex items-center justify-center d-block mx-auto gap-2 shadow-[0_0_20px_rgba(29,172,253,0.3)] hover:shadow-[0_0_25px_rgba(29,172,253,0.5)] whitespace-nowrap"
+              className="bg-accent hover:brightness-110 text-white px-6 py-3 rounded-xl font-medium transition-all duration-300 flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(29,172,253,0.3)] hover:shadow-[0_0_25px_rgba(29,172,253,0.5)] whitespace-nowrap"
             >
-              Stay Tuned <ArrowRight size={18} />
+              Notify Me <ArrowRight size={18} />
             </button>
           </motion.form>
         </motion.div>
