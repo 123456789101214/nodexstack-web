@@ -13,10 +13,15 @@ const projects = [
     category: "Enterprise POS Saas Platform",
     description: "Next-generation Cloud POS system with AI-driven analytics, real-time inventory management, and seamless omnichannel integration.",
     metrics: ["$2.4B Processed", "10x Faster", "Zero Downtime"],
-    tags: [""],
+    tags: ["React 19", "Next.js", "Tailwind v4"],
     image: "/1.png",
     link: "https://app.nexiacore.shop/",
     colSpan: "col-span-1 md:col-span-2",
+    // Premium Credentials Object Added Here
+    credentials: {
+      email: "nexiacorepos@gmail.com",
+      password: "user@123"
+    }
   },
   {
     id: 2,
@@ -29,28 +34,6 @@ const projects = [
     link: "https://nexiacore.shop/",
     colSpan: "col-span-1",
   }
-  // {
-  //   id: 3,
-  //   title: "Omni Vision",
-  //   category: "Computer Vision API",
-  //   description: "Real-time spatial mapping and object recognition system for autonomous logistics networks.",
-  //   metrics: ["99.8% Accuracy", "Global Scale"],
-  //   tags: ["OpenCV", "C++", "AWS"],
-  //   image: "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?q=80&w=2865&auto=format&fit=crop",
-  //   link: "#",
-  //   colSpan: "col-span-1",
-  // },
-  // {
-  //   id: 4,
-  //   title: "Zenith Cloud",
-  //   category: "Cloud Architecture",
-  //   description: "Serverless edge computing platform delivering unparalleled performance across 150+ global nodes.",
-  //   metrics: ["150+ Nodes", "Edge Computed", "Auto-scaling"],
-  //   tags: ["Turbopack", "Go", "Docker"],
-  //   image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2944&auto=format&fit=crop",
-  //   link: "#",
-  //   colSpan: "col-span-1 md:col-span-2",
-  // }
 ];
 
 const ProjectCard = ({ project, index }) => {
@@ -129,6 +112,29 @@ const ProjectCard = ({ project, index }) => {
               >
                 {project.description}
               </motion.p>
+
+              {/* Added: Premium Demo Credentials Display */}
+              {project.credentials && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-100px" }}
+                  transition={{ duration: 0.6, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                  className="mt-6 inline-flex"
+                >
+                  <div className="flex items-center gap-3 px-4 py-2.5 bg-[var(--bg)]/40 backdrop-blur-xl border border-[var(--border)] rounded-xl shadow-[0_4px_20px_transparent] transition-colors duration-700">
+                    <div className="flex items-center gap-2 pr-3 border-r border-[var(--border)]/50">
+                      <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
+                      <span className="text-[10px] font-mono text-[var(--text-secondary)] uppercase tracking-widest">Demo Access</span>
+                    </div>
+                    <div className="flex items-center gap-3 text-xs font-mono">
+                      <span className="text-[var(--text-primary)] selection:bg-[var(--accent)] selection:text-white">{project.credentials.email}</span>
+                      <span className="text-[var(--text-secondary)]/30">•</span>
+                      <span className="text-[var(--text-primary)] selection:bg-[var(--accent)] selection:text-white">{project.credentials.password}</span>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
             </div>
 
             {/* Metrics & Tags - Glassmorphism style that adapts to theme */}
