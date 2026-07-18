@@ -71,7 +71,7 @@ const projects = [
 
 // Reusable Hover Overlay for Expand Hint
 const ExpandOverlay = () => (
-  <div className="absolute inset-0 bg-[var(--bg)]/0 group-hover:bg-[var(--bg)]/30 transition-all duration-500 z-20 flex items-center justify-center opacity-0 group-hover:opacity-100 pointer-events-none">
+  <div className="absolute inset-0 bg-[var(--bg)]/0 group-hover:bg-[var(--bg)]/40 transition-all duration-500 z-20 flex items-center justify-center opacity-0 group-hover:opacity-100 pointer-events-none">
     <div className="w-12 h-12 rounded-full bg-[var(--surface)]/90 backdrop-blur-md flex items-center justify-center text-[var(--text-primary)] shadow-[0_0_20px_rgba(0,0,0,0.4)] transform scale-50 group-hover:scale-100 transition-transform duration-500 ease-[0.16,1,0.3,1]">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" />
@@ -135,7 +135,7 @@ const StackedCard = ({ project, index, progress, totalCards, onImageClick, onDem
   const targetScale = 1 - (totalCards - 1 - index) * 0.03;
   const scale = useTransform(progress, [index * 0.25, 1], [1, targetScale]);
   
-  const stickyTop = `calc(12vh + ${index * 30}px)`;
+  const stickyTop = `calc(10vh + ${index * 30}px)`;
 
   // Infinite Drag & Scroll Logic
   const [isHovered, setIsHovered] = useState(false);
@@ -146,6 +146,7 @@ const StackedCard = ({ project, index, progress, totalCards, onImageClick, onDem
   useEffect(() => {
     const calculateWidth = () => {
       if (innerRef.current) {
+        // Tailwind gap-6 is exactly 24px. Ensuring perfect math for seamless loops across all devices.
         setContentWidth(innerRef.current.offsetWidth + 24);
       }
     };
@@ -175,32 +176,33 @@ const StackedCard = ({ project, index, progress, totalCards, onImageClick, onDem
     <div className="h-screen flex items-start justify-center sticky top-0 px-2 md:px-8" style={{ top: stickyTop }}>
       <motion.div 
         style={{ scale }}
-        className="w-full max-w-[1440px] mx-auto h-[80vh] max-h-[850px] rounded-[30px] sm:rounded-[40px] md:rounded-[60px] border border-[var(--border)] bg-[var(--surface)] p-4 sm:p-6 md:p-8 flex flex-col gap-5 shadow-[0_10px_40px_transparent] hover:shadow-[0_10px_40px_var(--accent)]/10 transition-shadow duration-700 origin-top overflow-hidden"
+        // Adjusted mobile height to h-[75vh] to prevent ultra-tall distortion
+        className="w-full max-w-[1440px] mx-auto h-[75vh] md:h-[80vh] max-h-[850px] rounded-[30px] sm:rounded-[40px] md:rounded-[60px] border border-[var(--border)] bg-[var(--surface)] p-4 sm:p-6 md:p-8 flex flex-col gap-4 sm:gap-5 shadow-[0_10px_40px_transparent] hover:shadow-[0_10px_40px_var(--accent)]/10 transition-shadow duration-700 origin-top overflow-hidden"
       >
         
         {/* Top Row: Info & Actions */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 px-2 shrink-0 z-10">
-          <div className="flex flex-col gap-2">
-            <div className="flex items-center gap-4">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 sm:gap-6 px-1 md:px-2 shrink-0 z-10">
+          <div className="flex flex-col gap-1 sm:gap-2">
+            <div className="flex items-center gap-3 sm:gap-4">
               <span className="text-2xl md:text-4xl font-bold text-[var(--accent)] transition-colors duration-700">{project.id}</span>
-              <span className="text-[var(--text-secondary)] font-mono text-[10px] sm:text-xs tracking-widest uppercase border border-[var(--border)] px-4 py-1.5 rounded-full transition-colors duration-700">
+              <span className="text-[var(--text-secondary)] font-mono text-[9px] sm:text-xs tracking-widest uppercase border border-[var(--border)] px-3 sm:px-4 py-1 sm:py-1.5 rounded-full transition-colors duration-700">
                 {project.category}
               </span>
             </div>
             
-            <div className="flex flex-col sm:flex-row sm:items-center gap-4 mt-1">
-              <h3 className="text-2xl md:text-3xl font-medium text-[var(--text-primary)] tracking-tight transition-colors duration-700">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 mt-1">
+              <h3 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-medium text-[var(--text-primary)] tracking-tight transition-colors duration-700">
                 {project.title}
               </h3>
               
-              {/* Refined Premium Demo Button Trigger */}
+              {/* Premium Demo Button */}
               {project.credentials && (
                 <button
                   onClick={() => onDemoClick(project)}
-                  className="group flex items-center gap-3 px-4 py-2 mt-2 sm:mt-0 bg-[var(--bg)]/40 hover:bg-[var(--bg)] backdrop-blur-md border border-[var(--border)] rounded-full transition-all duration-300 w-fit"
+                  className="group flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-1.5 sm:py-2 bg-[var(--bg)]/40 hover:bg-[var(--bg)] backdrop-blur-md border border-[var(--border)] rounded-full transition-all duration-300 w-fit"
                 >
-                  <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
-                  <span className="text-[10px] sm:text-xs font-mono text-[var(--text-primary)] group-hover:text-[var(--accent)] uppercase tracking-widest transition-colors">
+                  <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
+                  <span className="text-[9px] sm:text-xs font-mono text-[var(--text-primary)] group-hover:text-[var(--accent)] uppercase tracking-widest transition-colors">
                     Demo Access
                   </span>
                 </button>
@@ -212,7 +214,7 @@ const StackedCard = ({ project, index, progress, totalCards, onImageClick, onDem
             <Link 
               href={project.link} 
               target="_blank"
-              className="inline-flex items-center justify-center px-6 py-2.5 sm:px-8 sm:py-3.5 rounded-full border border-[var(--border)] text-[var(--text-primary)] text-xs sm:text-sm font-medium uppercase tracking-widest hover:bg-[var(--text-primary)] hover:text-[var(--bg)] transition-all duration-500 cursor-none shrink-0"
+              className="inline-flex items-center justify-center px-5 py-2 sm:px-8 sm:py-3.5 rounded-full border border-[var(--border)] text-[var(--text-primary)] text-[10px] sm:text-sm font-medium uppercase tracking-widest hover:bg-[var(--text-primary)] hover:text-[var(--bg)] transition-all duration-500 cursor-none shrink-0 w-fit"
             >
               Live Project
             </Link>
@@ -221,7 +223,7 @@ const StackedCard = ({ project, index, progress, totalCards, onImageClick, onDem
 
         {/* Bottom Row: Carousel */}
         <div 
-          className="relative w-full flex-grow overflow-hidden rounded-[20px] sm:rounded-[30px] mt-2"
+          className="relative w-full flex-grow overflow-hidden rounded-[20px] sm:rounded-[30px] mt-2 sm:mt-0"
           style={{
             WebkitMaskImage: 'linear-gradient(to right, transparent, black 5%, black 95%, transparent)',
             maskImage: 'linear-gradient(to right, transparent, black 5%, black 95%, transparent)'
@@ -240,27 +242,30 @@ const StackedCard = ({ project, index, progress, totalCards, onImageClick, onDem
             onDragEnd={() => setIsHovered(false)}
             className="flex w-max h-full items-center py-2 cursor-grab active:cursor-grabbing" 
           >
+            {/* Unified gap-6 to prevent math mismatch on breakpoints */}
             {[1, 2].map((blockId) => (
-              <div key={blockId} ref={blockId === 1 ? innerRef : null} className="flex gap-4 md:gap-6 pr-4 md:pr-6 h-full">
+              <div key={blockId} ref={blockId === 1 ? innerRef : null} className="flex gap-6 pr-6 h-full">
                 {project.images.map((img, i) => (
                   <div 
                     key={`${blockId}-${i}`}
-                    className="relative h-full min-h-[250px] md:min-h-[350px] lg:min-h-[400px] w-[280px] sm:w-[450px] md:w-[650px] shrink-0 rounded-[20px] sm:rounded-[30px] overflow-hidden group bg-[var(--bg)] border border-[var(--border)]/40 pointer-events-auto"
+                    // Modified mobile width from w-[280px] to w-[80vw] preventing squished portrait look
+                    className="relative h-full min-h-[250px] md:min-h-[350px] lg:min-h-[400px] w-[85vw] md:w-[600px] lg:w-[700px] shrink-0 rounded-[20px] sm:rounded-[30px] overflow-hidden group bg-[var(--bg)] border border-[var(--border)]/40 pointer-events-auto"
                     onMouseUp={(e) => {
                       if (e.detail > 0) onImageClick(img);
                     }} 
                   >
                     <Image 
-                      src={img} 
-                      alt={`${project.title} Preview ${i + 1}`} 
-                      fill 
-                      className="object-cover object-center group-hover:scale-105 transition-transform duration-1000 ease-[0.16,1,0.3,1]" 
-                      sizes="(max-width: 768px) 100vw, 60vw" 
-                      priority={i < 2 && index === 0 && blockId === 1}
-                      draggable="false" 
-                    />
-                    <div className="absolute inset-0 border border-[var(--text-primary)]/10 rounded-[20px] sm:rounded-[30px] pointer-events-none z-10 mix-blend-overlay"></div>
-                    <ExpandOverlay />
+    src={img} 
+    alt={`${project.title} Preview ${i + 1}`} 
+    fill 
+    // object-top dammaama image eke top eka (header eka) kapenne nathuwa penawa
+    className="object-cover object-top group-hover:scale-105 transition-transform duration-1000 ease-[0.16,1,0.3,1]" 
+    sizes="(max-width: 768px) 85vw, 600px" 
+    priority={i < 2 && index === 0 && blockId === 1}
+    draggable="false" 
+  />
+  <div className="absolute inset-0 border border-[var(--text-primary)]/10 rounded-[20px] sm:rounded-[30px] pointer-events-none z-10 mix-blend-overlay"></div>
+  <ExpandOverlay />
                   </div>
                 ))}
               </div>
@@ -276,7 +281,6 @@ const StackedCard = ({ project, index, progress, totalCards, onImageClick, onDem
 export default function SelectedWorks() {
   const containerRef = useRef(null);
   
-  // States for Lightbox and Demo Modal
   const [selectedImage, setSelectedImage] = useState(null); 
   const [demoProject, setDemoProject] = useState(null);
   
@@ -285,7 +289,6 @@ export default function SelectedWorks() {
     offset: ["start start", "end end"]
   });
 
-  // Lock body scroll when either overlay is open
   useEffect(() => {
     if (selectedImage || demoProject) {
       document.body.style.overflow = "hidden";
@@ -299,23 +302,24 @@ export default function SelectedWorks() {
     <>
       <section 
         id="works" 
-        className="relative w-full bg-[var(--bg)] rounded-t-[40px] sm:rounded-t-[50px] md:rounded-t-[60px] -mt-10 sm:-mt-12 md:-mt-14 pt-24 pb-32 md:pt-32 md:pb-48 z-10 transition-colors duration-700"
+        // overflow-x-clip fixes the horizontal stretch bug completely without breaking sticky!
+        className="relative w-full overflow-x-clip bg-[var(--bg)] rounded-t-[40px] sm:rounded-t-[50px] md:rounded-t-[60px] -mt-10 sm:-mt-12 md:-mt-14 pt-20 pb-28 md:pt-32 md:pb-48 z-10 transition-colors duration-700"
       >
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-[var(--accent)]/10 blur-[150px] rounded-full pointer-events-none transition-colors duration-700" />
 
         <div className="max-w-[1440px] mx-auto px-4 md:px-8 xl:px-12 relative z-10">
-          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 mb-12 md:mb-20">
+          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 md:gap-8 mb-10 md:mb-20">
             <div>
               <motion.div
                 initial={{ opacity: 0, x: -20 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-                className="flex items-center gap-4 mb-6"
+                className="flex items-center gap-3 sm:gap-4 mb-4 sm:mb-6"
               >
-                <span className="text-[var(--accent)] font-mono text-sm tracking-widest transition-colors duration-700">03</span>
-                <span className="h-[1px] w-12 bg-[var(--accent)]/30 transition-colors duration-700"></span>
-                <span className="text-[var(--accent)] font-mono text-sm tracking-widest uppercase transition-colors duration-700">Selected Works</span>
+                <span className="text-[var(--accent)] font-mono text-xs sm:text-sm tracking-widest transition-colors duration-700">03</span>
+                <span className="h-[1px] w-8 sm:w-12 bg-[var(--accent)]/30 transition-colors duration-700"></span>
+                <span className="text-[var(--accent)] font-mono text-xs sm:text-sm tracking-widest uppercase transition-colors duration-700">Selected Works</span>
               </motion.div>
 
               <motion.h2
@@ -323,7 +327,7 @@ export default function SelectedWorks() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
-                className="text-[clamp(3.5rem,8vw,7rem)] leading-[1] font-medium text-[var(--text-primary)] tracking-tighter transition-colors duration-700"
+                className="text-[clamp(3rem,8vw,7rem)] leading-[1] font-medium text-[var(--text-primary)] tracking-tighter transition-colors duration-700"
               >
                 Project
               </motion.h2>
@@ -354,15 +358,15 @@ export default function SelectedWorks() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-            className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-8 bg-[var(--bg)]/90 backdrop-blur-2xl cursor-zoom-out"
+            className="fixed inset-0 z-[9999] flex items-center justify-center p-2 sm:p-8 bg-[var(--bg)]/95 backdrop-blur-2xl cursor-zoom-out"
             onClick={() => setSelectedImage(null)}
           >
-            <div className="absolute top-6 right-6 sm:top-10 sm:right-10 z-[10000]">
+            <div className="absolute top-4 right-4 sm:top-10 sm:right-10 z-[10000]">
               <button
                 onClick={() => setSelectedImage(null)}
-                className="w-12 h-12 flex items-center justify-center rounded-full bg-[var(--surface)] border border-[var(--border)] text-[var(--text-primary)] hover:bg-[var(--text-primary)] hover:text-[var(--bg)] transition-colors duration-300 shadow-[0_10px_30px_rgba(0,0,0,0.3)]"
+                className="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center rounded-full bg-[var(--surface)] border border-[var(--border)] text-[var(--text-primary)] hover:bg-[var(--text-primary)] hover:text-[var(--bg)] transition-colors duration-300 shadow-[0_10px_30px_rgba(0,0,0,0.3)]"
               >
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
               </button>
             </div>
             <motion.div
@@ -370,7 +374,7 @@ export default function SelectedWorks() {
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.9, y: 30, opacity: 0 }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="relative w-full max-w-[90vw] h-[85vh] rounded-[20px] sm:rounded-[30px] overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.5)] border border-[var(--border)] bg-[var(--bg)] cursor-default"
+              className="relative w-full max-w-[95vw] sm:max-w-[90vw] h-[75vh] sm:h-[85vh] rounded-[20px] sm:rounded-[30px] overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.5)] border border-[var(--border)] bg-[var(--bg)] cursor-default"
               onClick={(e) => e.stopPropagation()} 
             >
               <Image src={selectedImage} alt="Fullscreen View" fill className="object-contain" sizes="100vw" priority />
@@ -387,7 +391,7 @@ export default function SelectedWorks() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-            className="fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-[var(--bg)]/70 backdrop-blur-xl"
+            className="fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-[var(--bg)]/80 backdrop-blur-xl"
             onClick={() => setDemoProject(null)}
           >
             <motion.div
@@ -395,13 +399,13 @@ export default function SelectedWorks() {
               animate={{ scale: 1, y: 0, opacity: 1 }}
               exit={{ scale: 0.95, y: 20, opacity: 0 }}
               transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              className="w-full max-w-md bg-[var(--surface)] border border-[var(--border)] rounded-[30px] p-6 sm:p-8 shadow-[0_30px_100px_rgba(0,0,0,0.5)] relative flex flex-col gap-6"
+              className="w-full max-w-md bg-[var(--surface)] border border-[var(--border)] rounded-[24px] sm:rounded-[30px] p-5 sm:p-8 shadow-[0_30px_100px_rgba(0,0,0,0.8)] relative flex flex-col gap-5 sm:gap-6"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
-                  <span className="text-[10px] font-mono tracking-widest uppercase text-[var(--text-secondary)]">
+                <div className="flex items-center gap-2 sm:gap-3">
+                  <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
+                  <span className="text-[9px] sm:text-[10px] font-mono tracking-widest uppercase text-[var(--text-secondary)]">
                     Secure Access
                   </span>
                 </div>
@@ -409,20 +413,20 @@ export default function SelectedWorks() {
                   onClick={() => setDemoProject(null)}
                   className="w-8 h-8 flex items-center justify-center rounded-full bg-[var(--bg)] border border-[var(--border)] text-[var(--text-primary)] hover:bg-[var(--text-primary)] hover:text-[var(--bg)] transition-colors duration-300"
                 >
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                 </button>
               </div>
 
               <div>
-                <h3 className="text-2xl sm:text-3xl font-medium text-[var(--text-primary)] tracking-tight">
+                <h3 className="text-xl sm:text-3xl font-medium text-[var(--text-primary)] tracking-tight">
                   {demoProject.title}
                 </h3>
-                <p className="text-sm text-[var(--text-secondary)] mt-1">
+                <p className="text-xs sm:text-sm text-[var(--text-secondary)] mt-1 sm:mt-2 leading-relaxed">
                   Use the following credentials to access the live demo environment.
                 </p>
               </div>
 
-              <div className="flex flex-col gap-3">
+              <div className="flex flex-col gap-2 sm:gap-3">
                 <CredentialBlock label="Demo Email" value={demoProject.credentials.email} />
                 <CredentialBlock label="Password" value={demoProject.credentials.password} />
               </div>
@@ -430,10 +434,10 @@ export default function SelectedWorks() {
               <Link 
                 href={demoProject.link}
                 target="_blank"
-                className="w-full py-4 rounded-xl bg-[var(--text-primary)] text-[var(--bg)] flex items-center justify-center gap-2 font-medium uppercase tracking-widest text-xs hover:opacity-90 transition-opacity mt-2 cursor-none"
+                className="w-full py-3.5 sm:py-4 rounded-xl bg-[var(--text-primary)] text-[var(--bg)] flex items-center justify-center gap-2 font-medium uppercase tracking-widest text-[10px] sm:text-xs hover:opacity-90 transition-opacity mt-2 cursor-none"
               >
                 Launch Demo Portal
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
               </Link>
             </motion.div>
           </motion.div>
