@@ -104,7 +104,7 @@ export default function CustomCursor() {
     <>
       {/* --- LAYER 1: PREMIUM GLASS LENS (Background Trailing) --- */}
       <motion.div
-        className="fixed top-0 left-0 z-[9998] pointer-events-none rounded-full flex items-center justify-center will-change-transform"
+        className="fixed top-0 left-0 z-[99998] pointer-events-none rounded-full flex items-center justify-center will-change-transform"
         style={{
           x: lensX,
           y: lensY,
@@ -138,7 +138,7 @@ export default function CustomCursor() {
 
       {/* --- LAYER 2: DIRECTIONAL ARROW (Foreground Snappy) --- */}
       <motion.div
-        className="fixed top-0 left-0 z-[9999] pointer-events-none drop-shadow-[0_0_8px_rgba(0,240,255,0.6)] will-change-transform"
+        className="fixed top-0 left-0 z-[99999] pointer-events-none drop-shadow-[0_0_8px_rgba(0,240,255,0.6)] will-change-transform"
         style={{
           x: cursorX,
           y: cursorY,

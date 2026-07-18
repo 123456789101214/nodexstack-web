@@ -1,241 +1,444 @@
 "use client";
 
-import { useRef } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { useRef, useState, useEffect } from "react";
+import { motion, useScroll, useTransform, AnimatePresence, useAnimationFrame, useMotionValue } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 
-// Billion-dollar SaaS Portfolio Data
-const projects = [
-  {
-    id: 1,
-    title: "NexiaCore POS",
-    category: "Enterprise POS Saas Platform",
-    description: "Next-generation Cloud POS system with AI-driven analytics, real-time inventory management, and seamless omnichannel integration.",
-    metrics: ["$2.4B Processed", "10x Faster", "Zero Downtime"],
-    tags: ["React 19", "Next.js", "Tailwind v4"],
-    image: "/1.png",
-    link: "https://app.nexiacore.shop/",
-    colSpan: "col-span-1 md:col-span-2",
-    // Premium Credentials Object Added Here
-    credentials: {
-      email: "nexiacorepos@gmail.com",
-      password: "user@123"
-    }
-  },
-  {
-    id: 2,
-    title: "NexiaCore POS Marketing Website",
-    category: "Enterprise POS Saas Platform",
-    description: "Next-generation Cloud POS system with AI-driven analytics, real-time inventory management, and seamless omnichannel integration.",
-    metrics: ["0.2ms Latency", "99.999% SLA"],
-    tags: ["Rust", "React", "Node.js"],
-    image: "/2.png",
-    link: "https://nexiacore.shop/",
-    colSpan: "col-span-1",
-  }
-];
+// 1. MAGNETIC EFFECT COMPONENT
+const Magnet = ({ children, strength = 15 }) => {
+  const ref = useRef(null);
+  const [position, setPosition] = useState({ x: 0, y: 0 });
 
-const ProjectCard = ({ project, index }) => {
-  const cardRef = useRef(null);
+  const handleMouse = (e) => {
+    const { clientX, clientY } = e;
+    const { height, width, left, top } = ref.current.getBoundingClientRect();
+    const middleX = clientX - (left + width / 2);
+    const middleY = clientY - (top + height / 2);
+    setPosition({ x: middleX / strength, y: middleY / strength });
+  };
 
-  // Parallax effect based on scroll position
-  const { scrollYProgress } = useScroll({
-    target: cardRef,
-    offset: ["0 1", "1.2 1"],
-  });
-
-  const scale = useTransform(scrollYProgress, [0, 1], [0.85, 1]);
-  const opacity = useTransform(scrollYProgress, [0, 1], [0.3, 1]);
+  const reset = () => {
+    setPosition({ x: 0, y: 0 });
+  };
 
   return (
     <motion.div
-      ref={cardRef}
-      style={{ scale, opacity }}
-      className={`relative group rounded-3xl overflow-hidden bg-[var(--surface)] border border-[var(--border)] ${project.colSpan} shadow-[0_10px_40px_transparent] hover:shadow-[0_10px_40px_var(--accent)]/10 transition-all duration-700`}
+      ref={ref}
+      onMouseMove={handleMouse}
+      onMouseLeave={reset}
+      animate={{ x: position.x, y: position.y }}
+      transition={{ type: "spring", stiffness: 150, damping: 15, mass: 0.1 }}
+      className="inline-block"
     >
-      <Link href={project.link} className="block w-full h-full cursor-none" target="_blank">
-        {/* Image Container with Hover Parallax */}
-        <div className="relative h-[450px] md:h-[550px] w-full overflow-hidden bg-[var(--bg)]">
-          <motion.div
-            className="w-full h-full"
-            whileHover={{ scale: 1.05 }}
-            transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
-          >
-            <Image
-              src={project.image}
-              alt={project.title}
-              fill
-              className="object-contain object-center opacity-40 group-hover:opacity-70 transition-opacity duration-700"
-              sizes="(max-width: 768px) 100vw, 50vw"
-              priority={index < 2}
-            />
-            {/* Theme-Adaptive Gradient Overlay for perfect text readability across all 3 themes */}
-            <div className="absolute inset-0 bg-gradient-to-t from-[var(--surface)] via-[var(--surface)]/70 to-transparent transition-colors duration-700" />
-          </motion.div>
-        </div>
-
-        {/* Content Overlay */}
-        <div className="absolute bottom-0 left-0 w-full p-8 md:p-12 flex flex-col justify-end pointer-events-none">
-          <div className="flex flex-col xl:flex-row xl:items-end justify-between gap-8">
-
-            <div className="max-w-2xl">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-100px" }}
-                transition={{ duration: 0.6, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
-                className="flex items-center gap-3 mb-4"
-              >
-                <span className="h-[1px] w-8 bg-[var(--accent)]/50 block transition-colors duration-700"></span>
-                <p className="text-[var(--accent)] font-mono text-xs tracking-[0.2em] uppercase transition-colors duration-700">
-                  {project.category}
-                </p>
-              </motion.div>
-
-              <motion.h3
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-100px" }}
-                transition={{ duration: 0.6, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
-                className="text-3xl md:text-5xl lg:text-6xl font-medium text-[var(--text-primary)] mb-4 tracking-tight transition-colors duration-700"
-              >
-                {project.title}
-              </motion.h3>
-
-              <motion.p
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-100px" }}
-                transition={{ duration: 0.6, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
-                className="text-[var(--text-secondary)] text-base md:text-lg leading-relaxed max-w-xl transition-colors duration-700"
-              >
-                {project.description}
-              </motion.p>
-
-              {/* Added: Premium Demo Credentials Display */}
-              {project.credentials && (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-100px" }}
-                  transition={{ duration: 0.6, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
-                  className="mt-6 inline-flex"
-                >
-                  <div className="flex items-center gap-3 px-4 py-2.5 bg-[var(--bg)]/40 backdrop-blur-xl border border-[var(--border)] rounded-xl shadow-[0_4px_20px_transparent] transition-colors duration-700">
-                    <div className="flex items-center gap-2 pr-3 border-r border-[var(--border)]/50">
-                      <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
-                      <span className="text-[10px] font-mono text-[var(--text-secondary)] uppercase tracking-widest">Demo Access</span>
-                    </div>
-                    <div className="flex items-center gap-3 text-xs font-mono">
-                      <span className="text-[var(--text-primary)] selection:bg-[var(--accent)] selection:text-white">{project.credentials.email}</span>
-                      <span className="text-[var(--text-secondary)]/30">•</span>
-                      <span className="text-[var(--text-primary)] selection:bg-[var(--accent)] selection:text-white">{project.credentials.password}</span>
-                    </div>
-                  </div>
-                </motion.div>
-              )}
-            </div>
-
-            {/* Metrics & Tags - Glassmorphism style that adapts to theme */}
-            <div className="flex flex-col items-start xl:items-end gap-5">
-              <div className="flex flex-wrap gap-2">
-                {project.metrics.map((metric, i) => (
-                  <span
-                    key={i}
-                    className="px-4 py-1.5 text-xs font-medium text-[var(--text-primary)] bg-[var(--bg)]/40 backdrop-blur-xl rounded-full border border-[var(--border)] shadow-[0_4px_20px_transparent] transition-colors duration-700"
-                  >
-                    {metric}
-                  </span>
-                ))}
-              </div>
-              <div className="flex flex-wrap gap-3">
-                {project.tags.map((tag, i) => (
-                  <span key={i} className="text-xs font-mono text-[var(--text-secondary)]/70 uppercase tracking-wider transition-colors duration-700">
-                    {tag} {i !== project.tags.length - 1 && <span className="mx-2 text-[var(--border)]">•</span>}
-                  </span>
-                ))}
-              </div>
-            </div>
-
-          </div>
-        </div>
-      </Link>
+      {children}
     </motion.div>
   );
 };
 
-export default function SelectedWorks() {
+// 2. PROJECT DATA 
+const projects = [
+  {
+    id: "01",
+    title: "NexiaCore POS SaaS",
+    category: "Product by NodeXstack",
+    images: [
+      "/1.jpg",
+      "/1.jpg",
+      "/1.jpg",
+      "/1.jpg",
+      "/1.jpg",
+      "/1.jpg"
+    ],
+    link: "https://app.nexiacore.shop/",
+    credentials: { email: "nexiacorepos@gmail.com", password: "user@123" },
+  },
+  {
+    id: "02",
+    title: "NexiaCore Marketing Landing Page",
+    category: "Product by NodeXstack",
+    images: [
+      "/2.jpg",
+      "/2.jpg",
+      "/2.jpg",
+      "/2.jpg",
+      "/2.jpg",
+      "/2.jpg",
+    ],
+    link: "https://nexiacore.shop/",
+  },
+];
+
+// Reusable Hover Overlay for Expand Hint
+const ExpandOverlay = () => (
+  <div className="absolute inset-0 bg-[var(--bg)]/0 group-hover:bg-[var(--bg)]/30 transition-all duration-500 z-20 flex items-center justify-center opacity-0 group-hover:opacity-100 pointer-events-none">
+    <div className="w-12 h-12 rounded-full bg-[var(--surface)]/90 backdrop-blur-md flex items-center justify-center text-[var(--text-primary)] shadow-[0_0_20px_rgba(0,0,0,0.4)] transform scale-50 group-hover:scale-100 transition-transform duration-500 ease-[0.16,1,0.3,1]">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" />
+      </svg>
+    </div>
+  </div>
+);
+
+// Copy to Clipboard Micro-interaction Component for the Modal
+const CredentialBlock = ({ label, value }) => {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(value);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   return (
-    <section id="works" className="relative w-full bg-[var(--bg)] py-32 md:py-48 z-20 overflow-hidden transition-colors duration-700">
-
-      {/* Subtle Background Glow - Theme Adaptive */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-[var(--accent)]/15 blur-[120px] rounded-full pointer-events-none transition-colors duration-700" />
-
-      <div className="max-w-[1440px] mx-auto px-4 md:px-8 xl:px-12 relative z-10">
-
-        {/* Section Header */}
-        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 mb-20 md:mb-32">
-          <div>
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-              className="flex items-center gap-4 mb-6"
+    <div 
+      onClick={handleCopy}
+      className="group relative flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-4 rounded-2xl border border-[var(--border)] bg-[var(--bg)]/50 hover:bg-[var(--text-primary)] hover:border-[var(--text-primary)] transition-all duration-300 cursor-pointer overflow-hidden"
+    >
+      <div className="flex flex-col gap-1">
+        <span className="text-[10px] font-mono tracking-widest uppercase text-[var(--text-secondary)] group-hover:text-[var(--bg)]/70 transition-colors duration-300">{label}</span>
+        <span className="text-sm font-mono text-[var(--text-primary)] group-hover:text-[var(--bg)] transition-colors duration-300">{value}</span>
+      </div>
+      
+      <div className="flex items-center gap-2">
+        <AnimatePresence mode="wait">
+          {copied ? (
+            <motion.span 
+              key="copied"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="text-xs font-mono text-emerald-500 group-hover:text-[var(--bg)]"
             >
-              <span className="text-[var(--accent)] font-mono text-sm tracking-widest transition-colors duration-700">03</span>
-              <span className="h-[1px] w-12 bg-[var(--accent)]/30 transition-colors duration-700"></span>
-              <span className="text-[var(--accent)] font-mono text-sm tracking-widest uppercase transition-colors duration-700">Portfolio</span>
-            </motion.div>
-
-            <motion.h2
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
-              className="text-[clamp(3rem,8vw,6.5rem)] leading-[1.05] font-medium text-[var(--text-primary)] tracking-tighter transition-colors duration-700"
+              Copied!
+            </motion.span>
+          ) : (
+            <motion.span 
+              key="copy"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="text-xs font-mono text-[var(--text-secondary)] group-hover:text-[var(--bg)]/70 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity"
             >
-              Selected <br />
-              <span className="text-[var(--text-secondary)]">Masterpieces.</span>
-            </motion.h2>
+              Copy
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+            </motion.span>
+          )}
+        </AnimatePresence>
+      </div>
+    </div>
+  );
+};
+
+// 3. STACKING CARD COMPONENT
+const StackedCard = ({ project, index, progress, totalCards, onImageClick, onDemoClick }) => {
+  const targetScale = 1 - (totalCards - 1 - index) * 0.03;
+  const scale = useTransform(progress, [index * 0.25, 1], [1, targetScale]);
+  
+  const stickyTop = `calc(12vh + ${index * 30}px)`;
+
+  // Infinite Drag & Scroll Logic
+  const [isHovered, setIsHovered] = useState(false);
+  const [contentWidth, setContentWidth] = useState(0);
+  const innerRef = useRef(null);
+  const x = useMotionValue(0);
+
+  useEffect(() => {
+    const calculateWidth = () => {
+      if (innerRef.current) {
+        setContentWidth(innerRef.current.offsetWidth + 24);
+      }
+    };
+    calculateWidth();
+    
+    window.addEventListener("resize", calculateWidth);
+    return () => window.removeEventListener("resize", calculateWidth);
+  }, []);
+
+  useAnimationFrame((time, delta) => {
+    if (isHovered || contentWidth === 0) return;
+    
+    const moveBy = (delta / 1000) * 30; 
+    let currentX = x.get();
+    currentX -= moveBy;
+
+    if (currentX <= -contentWidth) {
+      currentX = currentX + contentWidth;
+    } else if (currentX > 0) {
+      currentX = currentX - contentWidth;
+    }
+    
+    x.set(currentX);
+  });
+
+  return (
+    <div className="h-screen flex items-start justify-center sticky top-0 px-2 md:px-8" style={{ top: stickyTop }}>
+      <motion.div 
+        style={{ scale }}
+        className="w-full max-w-[1440px] mx-auto h-[80vh] max-h-[850px] rounded-[30px] sm:rounded-[40px] md:rounded-[60px] border border-[var(--border)] bg-[var(--surface)] p-4 sm:p-6 md:p-8 flex flex-col gap-5 shadow-[0_10px_40px_transparent] hover:shadow-[0_10px_40px_var(--accent)]/10 transition-shadow duration-700 origin-top overflow-hidden"
+      >
+        
+        {/* Top Row: Info & Actions */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 px-2 shrink-0 z-10">
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-4">
+              <span className="text-2xl md:text-4xl font-bold text-[var(--accent)] transition-colors duration-700">{project.id}</span>
+              <span className="text-[var(--text-secondary)] font-mono text-[10px] sm:text-xs tracking-widest uppercase border border-[var(--border)] px-4 py-1.5 rounded-full transition-colors duration-700">
+                {project.category}
+              </span>
+            </div>
+            
+            <div className="flex flex-col sm:flex-row sm:items-center gap-4 mt-1">
+              <h3 className="text-2xl md:text-3xl font-medium text-[var(--text-primary)] tracking-tight transition-colors duration-700">
+                {project.title}
+              </h3>
+              
+              {/* Refined Premium Demo Button Trigger */}
+              {project.credentials && (
+                <button
+                  onClick={() => onDemoClick(project)}
+                  className="group flex items-center gap-3 px-4 py-2 mt-2 sm:mt-0 bg-[var(--bg)]/40 hover:bg-[var(--bg)] backdrop-blur-md border border-[var(--border)] rounded-full transition-all duration-300 w-fit"
+                >
+                  <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
+                  <span className="text-[10px] sm:text-xs font-mono text-[var(--text-primary)] group-hover:text-[var(--accent)] uppercase tracking-widest transition-colors">
+                    Demo Access
+                  </span>
+                </button>
+              )}
+            </div>
           </div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
-            className="max-w-lg lg:pb-4"
-          >
-            <p className="text-[var(--text-secondary)] text-lg md:text-xl leading-relaxed font-light transition-colors duration-700">
-              We don't just write code. We architect scalable, future-proof digital
-              experiences that define industry standards for the next generation of AI.
-            </p>
-            <Link
-              href="/portfolio"
-              className="inline-flex items-center gap-3 mt-8 text-[var(--text-primary)] hover:text-[var(--accent)] transition-colors duration-500 group text-sm font-mono tracking-widest uppercase cursor-none"
+          <Magnet>
+            <Link 
+              href={project.link} 
+              target="_blank"
+              className="inline-flex items-center justify-center px-6 py-2.5 sm:px-8 sm:py-3.5 rounded-full border border-[var(--border)] text-[var(--text-primary)] text-xs sm:text-sm font-medium uppercase tracking-widest hover:bg-[var(--text-primary)] hover:text-[var(--bg)] transition-all duration-500 cursor-none shrink-0"
             >
-              <span>Explore Archive</span>
-              <motion.span
-                className="inline-block"
-                whileHover={{ x: 8 }}
-                transition={{ type: "spring", stiffness: 400, damping: 10 }}
-              >
-                →
-              </motion.span>
+              Live Project
             </Link>
+          </Magnet>
+        </div>
+
+        {/* Bottom Row: Carousel */}
+        <div 
+          className="relative w-full flex-grow overflow-hidden rounded-[20px] sm:rounded-[30px] mt-2"
+          style={{
+            WebkitMaskImage: 'linear-gradient(to right, transparent, black 5%, black 95%, transparent)',
+            maskImage: 'linear-gradient(to right, transparent, black 5%, black 95%, transparent)'
+          }}
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+          onTouchStart={() => setIsHovered(true)}
+          onTouchEnd={() => setIsHovered(false)}
+        >
+          <motion.div
+            style={{ x }}
+            drag="x"
+            dragConstraints={{ left: -contentWidth, right: 0 }} 
+            dragElastic={0.15} 
+            onDragStart={() => setIsHovered(true)}
+            onDragEnd={() => setIsHovered(false)}
+            className="flex w-max h-full items-center py-2 cursor-grab active:cursor-grabbing" 
+          >
+            {[1, 2].map((blockId) => (
+              <div key={blockId} ref={blockId === 1 ? innerRef : null} className="flex gap-4 md:gap-6 pr-4 md:pr-6 h-full">
+                {project.images.map((img, i) => (
+                  <div 
+                    key={`${blockId}-${i}`}
+                    className="relative h-full min-h-[250px] md:min-h-[350px] lg:min-h-[400px] w-[280px] sm:w-[450px] md:w-[650px] shrink-0 rounded-[20px] sm:rounded-[30px] overflow-hidden group bg-[var(--bg)] border border-[var(--border)]/40 pointer-events-auto"
+                    onMouseUp={(e) => {
+                      if (e.detail > 0) onImageClick(img);
+                    }} 
+                  >
+                    <Image 
+                      src={img} 
+                      alt={`${project.title} Preview ${i + 1}`} 
+                      fill 
+                      className="object-cover object-center group-hover:scale-105 transition-transform duration-1000 ease-[0.16,1,0.3,1]" 
+                      sizes="(max-width: 768px) 100vw, 60vw" 
+                      priority={i < 2 && index === 0 && blockId === 1}
+                      draggable="false" 
+                    />
+                    <div className="absolute inset-0 border border-[var(--text-primary)]/10 rounded-[20px] sm:rounded-[30px] pointer-events-none z-10 mix-blend-overlay"></div>
+                    <ExpandOverlay />
+                  </div>
+                ))}
+              </div>
+            ))}
           </motion.div>
         </div>
+      </motion.div>
+    </div>
+  );
+};
 
-        {/* Projects Grid Layout */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 lg:gap-10">
-          {projects.map((project, index) => (
-            <ProjectCard key={project.id} project={project} index={index} />
-          ))}
+// 4. MAIN SECTION
+export default function SelectedWorks() {
+  const containerRef = useRef(null);
+  
+  // States for Lightbox and Demo Modal
+  const [selectedImage, setSelectedImage] = useState(null); 
+  const [demoProject, setDemoProject] = useState(null);
+  
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start start", "end end"]
+  });
+
+  // Lock body scroll when either overlay is open
+  useEffect(() => {
+    if (selectedImage || demoProject) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+    return () => { document.body.style.overflow = "unset"; };
+  }, [selectedImage, demoProject]);
+
+  return (
+    <>
+      <section 
+        id="works" 
+        className="relative w-full bg-[var(--bg)] rounded-t-[40px] sm:rounded-t-[50px] md:rounded-t-[60px] -mt-10 sm:-mt-12 md:-mt-14 pt-24 pb-32 md:pt-32 md:pb-48 z-10 transition-colors duration-700"
+      >
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-[var(--accent)]/10 blur-[150px] rounded-full pointer-events-none transition-colors duration-700" />
+
+        <div className="max-w-[1440px] mx-auto px-4 md:px-8 xl:px-12 relative z-10">
+          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 mb-12 md:mb-20">
+            <div>
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                className="flex items-center gap-4 mb-6"
+              >
+                <span className="text-[var(--accent)] font-mono text-sm tracking-widest transition-colors duration-700">03</span>
+                <span className="h-[1px] w-12 bg-[var(--accent)]/30 transition-colors duration-700"></span>
+                <span className="text-[var(--accent)] font-mono text-sm tracking-widest uppercase transition-colors duration-700">Selected Works</span>
+              </motion.div>
+
+              <motion.h2
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+                className="text-[clamp(3.5rem,8vw,7rem)] leading-[1] font-medium text-[var(--text-primary)] tracking-tighter transition-colors duration-700"
+              >
+                Project
+              </motion.h2>
+            </div>
+          </div>
         </div>
 
-      </div>
-    </section>
+        <div ref={containerRef} className="relative w-full px-2 md:px-8 xl:px-12" style={{ paddingBottom: "10vh" }}>
+          {projects.map((project, index) => (
+            <StackedCard 
+              key={project.id} 
+              project={project} 
+              index={index} 
+              progress={scrollYProgress}
+              totalCards={projects.length}
+              onImageClick={setSelectedImage} 
+              onDemoClick={setDemoProject}
+            />
+          ))}
+        </div>
+      </section>
+
+      {/* 5. CINEMATIC IMAGE LIGHTBOX */}
+      <AnimatePresence>
+        {selectedImage && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+            className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-8 bg-[var(--bg)]/90 backdrop-blur-2xl cursor-zoom-out"
+            onClick={() => setSelectedImage(null)}
+          >
+            <div className="absolute top-6 right-6 sm:top-10 sm:right-10 z-[10000]">
+              <button
+                onClick={() => setSelectedImage(null)}
+                className="w-12 h-12 flex items-center justify-center rounded-full bg-[var(--surface)] border border-[var(--border)] text-[var(--text-primary)] hover:bg-[var(--text-primary)] hover:text-[var(--bg)] transition-colors duration-300 shadow-[0_10px_30px_rgba(0,0,0,0.3)]"
+              >
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+              </button>
+            </div>
+            <motion.div
+              initial={{ scale: 0.9, y: 30 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 30, opacity: 0 }}
+              transition={{ type: "spring", damping: 25, stiffness: 200 }}
+              className="relative w-full max-w-[90vw] h-[85vh] rounded-[20px] sm:rounded-[30px] overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.5)] border border-[var(--border)] bg-[var(--bg)] cursor-default"
+              onClick={(e) => e.stopPropagation()} 
+            >
+              <Image src={selectedImage} alt="Fullscreen View" fill className="object-contain" sizes="100vw" priority />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* 6. PREMIUM DEMO CREDENTIALS MODAL */}
+      <AnimatePresence>
+        {demoProject && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+            className="fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-[var(--bg)]/70 backdrop-blur-xl"
+            onClick={() => setDemoProject(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, y: 20, opacity: 0 }}
+              animate={{ scale: 1, y: 0, opacity: 1 }}
+              exit={{ scale: 0.95, y: 20, opacity: 0 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              className="w-full max-w-md bg-[var(--surface)] border border-[var(--border)] rounded-[30px] p-6 sm:p-8 shadow-[0_30px_100px_rgba(0,0,0,0.5)] relative flex flex-col gap-6"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
+                  <span className="text-[10px] font-mono tracking-widest uppercase text-[var(--text-secondary)]">
+                    Secure Access
+                  </span>
+                </div>
+                <button
+                  onClick={() => setDemoProject(null)}
+                  className="w-8 h-8 flex items-center justify-center rounded-full bg-[var(--bg)] border border-[var(--border)] text-[var(--text-primary)] hover:bg-[var(--text-primary)] hover:text-[var(--bg)] transition-colors duration-300"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+              </div>
+
+              <div>
+                <h3 className="text-2xl sm:text-3xl font-medium text-[var(--text-primary)] tracking-tight">
+                  {demoProject.title}
+                </h3>
+                <p className="text-sm text-[var(--text-secondary)] mt-1">
+                  Use the following credentials to access the live demo environment.
+                </p>
+              </div>
+
+              <div className="flex flex-col gap-3">
+                <CredentialBlock label="Demo Email" value={demoProject.credentials.email} />
+                <CredentialBlock label="Password" value={demoProject.credentials.password} />
+              </div>
+              
+              <Link 
+                href={demoProject.link}
+                target="_blank"
+                className="w-full py-4 rounded-xl bg-[var(--text-primary)] text-[var(--bg)] flex items-center justify-center gap-2 font-medium uppercase tracking-widest text-xs hover:opacity-90 transition-opacity mt-2 cursor-none"
+              >
+                Launch Demo Portal
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+              </Link>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
   );
 }
