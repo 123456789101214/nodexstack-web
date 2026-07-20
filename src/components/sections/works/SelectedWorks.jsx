@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState, useEffect } from "react";
-import { motion, useScroll, useTransform, AnimatePresence, useAnimationFrame, useMotionValue } from "framer-motion";
+import { motion, useScroll, useTransform, AnimatePresence, useAnimationFrame, useMotionValue, animate } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -43,12 +43,9 @@ const projects = [
     title: "NexiaCore POS SaaS",
     category: "Product by NodeXstack",
     images: [
-      "/1.jpg",
-      "/1.jpg",
-      "/1.jpg",
-      "/1.jpg",
-      "/1.jpg",
-      "/1.jpg"
+      "/nexiacore-pos-001.jpg",
+      "/nexiacore-pos-002.jpg",
+      "/nexiacore-pos-003.jpg",
     ],
     link: "https://app.nexiacore.shop/",
     credentials: { email: "nexiacorepos@gmail.com", password: "user@123" },
@@ -58,25 +55,40 @@ const projects = [
     title: "NexiaCore Marketing Landing Page",
     category: "Product by NodeXstack",
     images: [
-      "/2.jpg",
-      "/2.jpg",
-      "/2.jpg",
-      "/2.jpg",
-      "/2.jpg",
-      "/2.jpg",
+      "/nexiacore-landing-001.jpg",
+      "/nexiacore-landing-002.jpg",
+      "/nexiacore-landing-003.jpg",
     ],
     link: "https://nexiacore.shop/",
   },
+  {
+    id: "03",
+    title: "NovaCat Cloud POS",
+    category: "Product by NodeXstack",
+    images: [
+      "/novacart-pos-001.jpg",
+      "/novacart-pos-002.jpg",
+      "/novacart-pos-003.jpg",
+    ],
+    link: "#",
+    credentials: { email: "admin@store.com", password: "Admin@123" },
+  },
 ];
 
-// Reusable Hover Overlay for Expand Hint
-const ExpandOverlay = () => (
+// Reusable Hover Overlay (UPDATED: Click only triggers here now)
+const ExpandOverlay = ({ onExpand }) => (
   <div className="absolute inset-0 bg-[var(--bg)]/0 group-hover:bg-[var(--bg)]/40 transition-all duration-500 z-20 flex items-center justify-center opacity-0 group-hover:opacity-100 pointer-events-none">
-    <div className="w-12 h-12 rounded-full bg-[var(--surface)]/90 backdrop-blur-md flex items-center justify-center text-[var(--text-primary)] shadow-[0_0_20px_rgba(0,0,0,0.4)] transform scale-50 group-hover:scale-100 transition-transform duration-500 ease-[0.16,1,0.3,1]">
+    <button 
+      onClick={(e) => {
+        e.stopPropagation(); // Prevents drag events from conflicting
+        onExpand();
+      }}
+      className="w-12 h-12 rounded-full bg-[var(--surface)]/90 backdrop-blur-md flex items-center justify-center text-[var(--text-primary)] shadow-[0_0_20px_rgba(0,0,0,0.4)] transform scale-50 group-hover:scale-100 transition-transform duration-500 ease-[0.16,1,0.3,1] pointer-events-auto hover:bg-[var(--accent)] hover:text-[var(--bg)] border border-[var(--border)]"
+    >
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" />
       </svg>
-    </div>
+    </button>
   </div>
 );
 
@@ -146,15 +158,39 @@ const StackedCard = ({ project, index, progress, totalCards, onImageClick, onDem
   useEffect(() => {
     const calculateWidth = () => {
       if (innerRef.current) {
-        // Tailwind gap-6 is exactly 24px. Ensuring perfect math for seamless loops across all devices.
-        setContentWidth(innerRef.current.offsetWidth + 24);
+        setContentWidth(innerRef.current.offsetWidth + 24); // 24px is gap-6
       }
     };
     calculateWidth();
-    
     window.addEventListener("resize", calculateWidth);
     return () => window.removeEventListener("resize", calculateWidth);
   }, []);
+
+  // Premium Custom Arrow Scroll Math
+  const handleManualScroll = (direction) => {
+    const shiftAmount = window.innerWidth < 768 ? 320 : 650; // Roughly one image width + gap
+    const currentX = x.get();
+    const targetX = currentX + (direction === 'left' ? shiftAmount : -shiftAmount);
+
+    // Spring physics for smooth arrow navigation
+    animate(x, targetX, {
+      type: "spring",
+      stiffness: 200,
+      damping: 30,
+      mass: 1,
+    });
+  };
+
+  // Bind Keyboard Left/Right Arrows when this specific card is hovered
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (!isHovered) return;
+      if (e.key === "ArrowLeft") handleManualScroll('left');
+      if (e.key === "ArrowRight") handleManualScroll('right');
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isHovered, x]);
 
   useAnimationFrame((time, delta) => {
     if (isHovered || contentWidth === 0) return;
@@ -176,8 +212,12 @@ const StackedCard = ({ project, index, progress, totalCards, onImageClick, onDem
     <div className="h-screen flex items-start justify-center sticky top-0 px-2 md:px-8" style={{ top: stickyTop }}>
       <motion.div 
         style={{ scale }}
-        // Adjusted mobile height to h-[75vh] to prevent ultra-tall distortion
-        className="w-full max-w-[1440px] mx-auto h-[75vh] md:h-[80vh] max-h-[850px] rounded-[30px] sm:rounded-[40px] md:rounded-[60px] border border-[var(--border)] bg-[var(--surface)] p-4 sm:p-6 md:p-8 flex flex-col gap-4 sm:gap-5 shadow-[0_10px_40px_transparent] hover:shadow-[0_10px_40px_var(--accent)]/10 transition-shadow duration-700 origin-top overflow-hidden"
+        // group/card added for targeting child arrows
+        className="group/card w-full max-w-[1440px] mx-auto h-[75vh] md:h-[80vh] max-h-[850px] rounded-[30px] sm:rounded-[40px] md:rounded-[60px] border border-[var(--border)] bg-[var(--surface)] p-4 sm:p-6 md:p-8 flex flex-col gap-4 sm:gap-5 shadow-[0_10px_40px_transparent] hover:shadow-[0_10px_40px_var(--accent)]/10 transition-shadow duration-700 origin-top overflow-hidden relative"
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        onTouchStart={() => setIsHovered(true)}
+        onTouchEnd={() => setIsHovered(false)}
       >
         
         {/* Top Row: Info & Actions */}
@@ -195,7 +235,6 @@ const StackedCard = ({ project, index, progress, totalCards, onImageClick, onDem
                 {project.title}
               </h3>
               
-              {/* Premium Demo Button */}
               {project.credentials && (
                 <button
                   onClick={() => onDemoClick(project)}
@@ -221,6 +260,22 @@ const StackedCard = ({ project, index, progress, totalCards, onImageClick, onDem
           </Magnet>
         </div>
 
+        {/* Floating Premium Navigation Arrows (Visible on Desktop Hover) */}
+        <div className="absolute right-6 top-[60%] -translate-y-1/2 flex items-center gap-3 z-30 opacity-0 group-hover/card:opacity-100 transition-opacity duration-500 hidden sm:flex pointer-events-none">
+          <button 
+            onClick={() => handleManualScroll('left')}
+            className="pointer-events-auto w-12 h-12 rounded-full backdrop-blur-lg bg-[var(--surface)]/80 border border-[var(--border)] flex items-center justify-center text-[var(--text-primary)] hover:bg-[var(--text-primary)] hover:text-[var(--bg)] hover:scale-110 active:scale-95 transition-all duration-300 shadow-[0_10px_20px_rgba(0,0,0,0.3)]"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+          </button>
+          <button 
+            onClick={() => handleManualScroll('right')}
+            className="pointer-events-auto w-12 h-12 rounded-full backdrop-blur-lg bg-[var(--surface)]/80 border border-[var(--border)] flex items-center justify-center text-[var(--text-primary)] hover:bg-[var(--text-primary)] hover:text-[var(--bg)] hover:scale-110 active:scale-95 transition-all duration-300 shadow-[0_10px_20px_rgba(0,0,0,0.3)]"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+          </button>
+        </div>
+
         {/* Bottom Row: Carousel */}
         <div 
           className="relative w-full flex-grow overflow-hidden rounded-[20px] sm:rounded-[30px] mt-2 sm:mt-0"
@@ -228,44 +283,35 @@ const StackedCard = ({ project, index, progress, totalCards, onImageClick, onDem
             WebkitMaskImage: 'linear-gradient(to right, transparent, black 5%, black 95%, transparent)',
             maskImage: 'linear-gradient(to right, transparent, black 5%, black 95%, transparent)'
           }}
-          onMouseEnter={() => setIsHovered(true)}
-          onMouseLeave={() => setIsHovered(false)}
-          onTouchStart={() => setIsHovered(true)}
-          onTouchEnd={() => setIsHovered(false)}
         >
           <motion.div
             style={{ x }}
             drag="x"
             dragConstraints={{ left: -contentWidth, right: 0 }} 
             dragElastic={0.15} 
-            onDragStart={() => setIsHovered(true)}
-            onDragEnd={() => setIsHovered(false)}
             className="flex w-max h-full items-center py-2 cursor-grab active:cursor-grabbing" 
           >
-            {/* Unified gap-6 to prevent math mismatch on breakpoints */}
             {[1, 2].map((blockId) => (
               <div key={blockId} ref={blockId === 1 ? innerRef : null} className="flex gap-6 pr-6 h-full">
                 {project.images.map((img, i) => (
                   <div 
                     key={`${blockId}-${i}`}
-                    // Modified mobile width from w-[280px] to w-[80vw] preventing squished portrait look
                     className="relative h-full min-h-[250px] md:min-h-[350px] lg:min-h-[400px] w-[85vw] md:w-[600px] lg:w-[700px] shrink-0 rounded-[20px] sm:rounded-[30px] overflow-hidden group bg-[var(--bg)] border border-[var(--border)]/40 pointer-events-auto"
-                    onMouseUp={(e) => {
-                      if (e.detail > 0) onImageClick(img);
-                    }} 
+                    // Removed onMouseUp. Click is now safely handled by ExpandOverlay alone!
                   >
                     <Image 
-    src={img} 
-    alt={`${project.title} Preview ${i + 1}`} 
-    fill 
-    // object-top dammaama image eke top eka (header eka) kapenne nathuwa penawa
-    className="object-cover object-top group-hover:scale-105 transition-transform duration-1000 ease-[0.16,1,0.3,1]" 
-    sizes="(max-width: 768px) 85vw, 600px" 
-    priority={i < 2 && index === 0 && blockId === 1}
-    draggable="false" 
-  />
-  <div className="absolute inset-0 border border-[var(--text-primary)]/10 rounded-[20px] sm:rounded-[30px] pointer-events-none z-10 mix-blend-overlay"></div>
-  <ExpandOverlay />
+                      src={img} 
+                      alt={`${project.title} Preview ${i + 1}`} 
+                      fill 
+                      className="object-cover object-top sm:object-center group-hover:scale-105 transition-transform duration-1000 ease-[0.16,1,0.3,1]" 
+                      sizes="(max-width: 768px) 85vw, 600px" 
+                      priority={i < 2 && index === 0 && blockId === 1}
+                      draggable="false" 
+                    />
+                    <div className="absolute inset-0 border border-[var(--text-primary)]/10 rounded-[20px] sm:rounded-[30px] pointer-events-none z-10 mix-blend-overlay"></div>
+                    
+                    {/* Expand Click triggers specific image index */}
+                    <ExpandOverlay onExpand={() => onImageClick({ images: project.images, index: i })} />
                   </div>
                 ))}
               </div>
@@ -281,7 +327,8 @@ const StackedCard = ({ project, index, progress, totalCards, onImageClick, onDem
 export default function SelectedWorks() {
   const containerRef = useRef(null);
   
-  const [selectedImage, setSelectedImage] = useState(null); 
+  // Update Lightbox state to hold array and current index for swiping
+  const [lightboxData, setLightboxData] = useState(null); // { images: [], index: 0 }
   const [demoProject, setDemoProject] = useState(null);
   
   const { scrollYProgress } = useScroll({
@@ -290,19 +337,41 @@ export default function SelectedWorks() {
   });
 
   useEffect(() => {
-    if (selectedImage || demoProject) {
+    if (lightboxData || demoProject) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "unset";
     }
     return () => { document.body.style.overflow = "unset"; };
-  }, [selectedImage, demoProject]);
+  }, [lightboxData, demoProject]);
+
+  // Lightbox Pagination Logic
+  const paginateLightbox = (newDirection) => {
+    setLightboxData((prev) => {
+      if (!prev) return prev;
+      let nextIndex = prev.index + newDirection;
+      if (nextIndex < 0) nextIndex = prev.images.length - 1;
+      if (nextIndex >= prev.images.length) nextIndex = 0;
+      return { ...prev, index: nextIndex };
+    });
+  };
+
+  // Bind Keyboard Left/Right Arrows for Lightbox Navigation
+  useEffect(() => {
+    const handleLightboxKeyDown = (e) => {
+      if (!lightboxData) return;
+      if (e.key === "ArrowLeft") paginateLightbox(-1);
+      if (e.key === "ArrowRight") paginateLightbox(1);
+      if (e.key === "Escape") setLightboxData(null);
+    };
+    window.addEventListener("keydown", handleLightboxKeyDown);
+    return () => window.removeEventListener("keydown", handleLightboxKeyDown);
+  }, [lightboxData]);
 
   return (
     <>
       <section 
         id="works" 
-        // overflow-x-clip fixes the horizontal stretch bug completely without breaking sticky!
         className="relative w-full overflow-x-clip bg-[var(--bg)] rounded-t-[40px] sm:rounded-t-[50px] md:rounded-t-[60px] -mt-10 sm:-mt-12 md:-mt-14 pt-20 pb-28 md:pt-32 md:pb-48 z-10 transition-colors duration-700"
       >
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-[var(--accent)]/10 blur-[150px] rounded-full pointer-events-none transition-colors duration-700" />
@@ -335,7 +404,7 @@ export default function SelectedWorks() {
           </div>
         </div>
 
-        <div ref={containerRef} className="relative w-full px-2 md:px-8 xl:px-12" style={{ paddingBottom: "10vh" }}>
+        <div ref={containerRef} className="relative w-full px-2 md:px-8 xl:px-12 z-[99998]" style={{ paddingBottom: "10vh" }}>
           {projects.map((project, index) => (
             <StackedCard 
               key={project.id} 
@@ -343,42 +412,73 @@ export default function SelectedWorks() {
               index={index} 
               progress={scrollYProgress}
               totalCards={projects.length}
-              onImageClick={setSelectedImage} 
+              onImageClick={setLightboxData} // Passes { images, index }
               onDemoClick={setDemoProject}
             />
           ))}
         </div>
       </section>
 
-      {/* 5. CINEMATIC IMAGE LIGHTBOX */}
+      {/* 5. CINEMATIC SWIPEABLE IMAGE LIGHTBOX */}
       <AnimatePresence>
-        {selectedImage && (
+        {lightboxData && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-            className="fixed inset-0 z-[9999] flex items-center justify-center p-2 sm:p-8 bg-[var(--bg)]/95 backdrop-blur-2xl cursor-zoom-out"
-            onClick={() => setSelectedImage(null)}
+            className="fixed inset-0 z-[9999] flex items-center justify-center p-0 sm:p-8 bg-[var(--bg)]/95 backdrop-blur-2xl overflow-hidden"
           >
-            <div className="absolute top-4 right-4 sm:top-10 sm:right-10 z-[10000]">
+            {/* Global Lightbox Close */}
+            <div className="absolute top-6 right-6 sm:top-10 sm:right-10 z-[10000]">
               <button
-                onClick={() => setSelectedImage(null)}
-                className="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center rounded-full bg-[var(--surface)] border border-[var(--border)] text-[var(--text-primary)] hover:bg-[var(--text-primary)] hover:text-[var(--bg)] transition-colors duration-300 shadow-[0_10px_30px_rgba(0,0,0,0.3)]"
+                onClick={() => setLightboxData(null)}
+                className="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center rounded-full bg-[var(--surface)] border border-[var(--border)] text-[var(--text-primary)] hover:bg-[var(--text-primary)] hover:text-[var(--bg)] transition-all duration-300 shadow-[0_10px_30px_rgba(0,0,0,0.3)] hover:scale-110 active:scale-95"
               >
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
               </button>
             </div>
-            <motion.div
-              initial={{ scale: 0.9, y: 30 }}
-              animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.9, y: 30, opacity: 0 }}
-              transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="relative w-full max-w-[95vw] sm:max-w-[90vw] h-[75vh] sm:h-[85vh] rounded-[20px] sm:rounded-[30px] overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.5)] border border-[var(--border)] bg-[var(--bg)] cursor-default"
-              onClick={(e) => e.stopPropagation()} 
-            >
-              <Image src={selectedImage} alt="Fullscreen View" fill className="object-contain" sizes="100vw" priority />
-            </motion.div>
+
+            {/* Lightbox Side Navigation Arrows (Desktop) */}
+            <button onClick={() => paginateLightbox(-1)} className="hidden sm:flex absolute left-8 z-[10000] w-14 h-14 items-center justify-center rounded-full bg-[var(--surface)]/50 backdrop-blur border border-[var(--border)] text-[var(--text-primary)] hover:bg-[var(--text-primary)] hover:text-[var(--bg)] transition-all duration-300 hover:scale-110">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+            </button>
+            <button onClick={() => paginateLightbox(1)} className="hidden sm:flex absolute right-8 z-[10000] w-14 h-14 items-center justify-center rounded-full bg-[var(--surface)]/50 backdrop-blur border border-[var(--border)] text-[var(--text-primary)] hover:bg-[var(--text-primary)] hover:text-[var(--bg)] transition-all duration-300 hover:scale-110">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+            </button>
+
+            {/* Draggable Swipe Area */}
+            <div className="relative w-full h-full flex items-center justify-center cursor-grab active:cursor-grabbing">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={lightboxData.index}
+                  initial={{ opacity: 0, x: 100, scale: 0.95 }}
+                  animate={{ opacity: 1, x: 0, scale: 1 }}
+                  exit={{ opacity: 0, x: -100, scale: 0.95 }}
+                  transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                  // Framer Motion Drag constraints for swipe functionality
+                  drag="x"
+                  dragConstraints={{ left: 0, right: 0 }}
+                  dragElastic={1}
+                  onDragEnd={(e, { offset }) => {
+                    // Swipe thresholds
+                    if (offset.x < -75) paginateLightbox(1);
+                    else if (offset.x > 75) paginateLightbox(-1);
+                  }}
+                  className="relative w-full max-w-[95vw] sm:max-w-[85vw] h-[75vh] sm:h-[85vh]"
+                >
+                  <Image 
+                    src={lightboxData.images[lightboxData.index]} 
+                    alt="Fullscreen View" 
+                    fill 
+                    className="object-contain rounded-[20px] sm:rounded-[30px]" 
+                    sizes="100vw" 
+                    priority 
+                    draggable="false"
+                  />
+                </motion.div>
+              </AnimatePresence>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
