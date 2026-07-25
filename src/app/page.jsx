@@ -4,7 +4,7 @@ import Services from "@/components/sections/services/Services";
 import Process from "@/components/sections/process/Process";
 import SelectedWorks from "@/components/sections/works/SelectedWorks"
 import Technologies from "@/components/sections/technologies/Technologies";
-import Testimonials from "@/components/sections/testimonials/Testimonials";
+import ManifestoCarousel from "@/components/sections/ManifestoCarousel/ManifestoCarousel";
 import CTA from "@/components/sections/cta/CTA";
 import Footer from "@/components/layout/Footer";
 
@@ -16,7 +16,7 @@ export default function Home() {
       <Process />
       <SelectedWorks />
       <Technologies />
-      <Testimonials />
+      <ManifestoCarousel />
       <CTA />
       <Footer />
       {/* Scroll scroll wenna podi space ekak (Testing purpose) */}
